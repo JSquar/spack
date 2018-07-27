@@ -44,31 +44,73 @@ class SagaGis(AutotoolsPackage):
     """FIXME: Put a proper description of your package here."""
 
     homepage = "http://saga-gis.org/"
-    url      = "https://sourceforge.net/projects/saga-gis/files/SAGA%20-%205/SAGA%20-%205.0.0/saga-5.0.0.tar.gz"
-    git      = "https://git.code.sf.net/p/saga-gis/code.git"
-
-
-    version('develop', branch='master')
-    version('6.0.0', branch='release-6.0.0')
-    version('5.0.1', branch='release-5-0-1')
-    version('5.0.0', '475adff7b2e05cbdf5ccabfbbca449ac')
-
-    depends_on('autoconf', type='build')
-    depends_on('automake', type='build')
-    depends_on('libtool',  type='build')
-    depends_on('m4',       type='build')
-
-    depends_on('wx')
-    depends_on('gdal')
-    depends_on('unixodbc')
-    depends_on('proj')
+#FIXME: Url noch nicht ausreichend für automatischen Download
+#    url      = "https://sourceforge.net/projects/saga-gis/files/SAGA%20-%205/SAGA%20-%205.0.0/saga-5.0.0.tar.gz"
+#    git      = "https://git.code.sf.net/p/saga-gis/code.git"
+#
+#
+#    version('develop', branch='master')
+#    version('6.0.0', branch='release-6.0.0')
+#    version('5.0.1', branch='release-5-0-1')
+#    version('5.0.0', '475adff7b2e05cbdf5ccabfbbca449ac')
+#
+#    variant('shared',   default=True,   description='Build shared libraries')
+#    variant('static',   default=True,   description='Build static libraries')
+##FIXME: Debug Variant notwendig?
+#    #variant('debug',    default=False,  description='Turn on debugging')
+#    variant('gui',      default=True,   description='Build GUI and interactive SAGA tools')
+#    variant('odbc',     default=True,   description='Build with ODBC support')
+#    variant('triangle', default=True,   description='Build with triangle.c (non free for commercial use); otherwise use qhull')
+#    variant('libfire',  default=True,   description='Build with libfire (non free for commercial usage)')
+#    variant('openmp',   default=True,   description='Build with OpenMP enabled')
+#    variant('python',   default=False,  description='Build Python extension')
+#
+#    depends_on('autoconf', type='build')
+#    depends_on('automake', type='build')
+#    depends_on('libtool',  type='build')
+#    depends_on('m4',       type='build')
+#
+#    depends_on('wx')
+#    depends_on('gdal')
+#    depends_on('unixodbc')
+#    depends_on('proj')
+#    depends_on('qhull', when='~triangle')
 
     def autoreconf(self, spec, prefix):
         # FIXME: Modify the autoreconf method as necessary
         autoreconf('--install', '--verbose', '--force')
 
-    def configure_args(self):
-        # FIXME: Add arguments other than --prefix
-        # FIXME: If not needed delete this function
-        args = []
-        return args
+#    def configure_args(self):
+#        # FIXME: Add arguments other than --prefix
+#        # FIXME: If not needed delete this function
+#        args = []
+#        if spec.satisfies('@5:'):
+#            if '+shared' in spec:
+#                args.append('--enable-shared=yes')
+#            else:
+#                args.append('--enable-shared=no')
+#
+#            if '+static' in spec:
+#                args.append('--enable-static=yes')
+#            else:
+#                args.append('--enable-static=no')
+#
+#            if '~gui' in spec:
+#                args.append('--disable-gui')
+#
+#            if '~odbc' in spec:
+#                args.append('--disable-odbc')
+#
+#            if '~triangle' in spec:
+#                args.append('--disable-triangle')
+#
+#            if '~libfire' in spec:
+#                args.append('--disable-libfire')
+#
+#            if '~openmpi' in spec:
+#                args.append('--disable-openmp')
+#
+#            if '+python' in spec:
+#                args.append('--enable-python')
+#
+#        return args
