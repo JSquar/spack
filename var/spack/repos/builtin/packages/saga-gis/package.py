@@ -33,15 +33,26 @@ class SagaGis(AutotoolsPackage):
     interface with many visualisation options
     """
 
-    homepage = "http://saga-gis.org/"
-    url      = "https://sourceforge.net/projects/saga-gis/files/SAGA%20-%205/SAGA%20-%205.0.0/saga-5.0.0.tar.gz"
-#    git      = "https://git.code.sf.net/p/saga-gis/code.git"
-#
-#
-#    version('develop', branch='master')
-#    version('6.0.0', branch='release-6.0.0')
-#    version('5.0.1', branch='release-5-0-1')
-    version('5.0.0', '475adff7b2e05cbdf5ccabfbbca449ac')
+    homepage    = "http://saga-gis.org/"
+    url         = "https://sourceforge.net/projects/saga-gis/files/SAGA%20-%205/SAGA%20-%205.0.0/saga-5.0.0.tar.gz"
+    git         = "git://git.code.sf.net/p/saga-gis/code"
+
+    version('develop',  branch='master')
+    version('6.4.0',    branch='release-6.4.0', preferred=True)
+    version('6.3.0',    branch='release-6.3.0')
+    version('6.2.0',    branch='release-6.2.0')
+    version('6.1.0',    branch='release-6.1.0')
+    version('6.0.0',    branch='release-6.0.0')
+    version('5.0.1',    branch='release-5-0-1')
+    version('5.0.0',    branch='release-5.0.0')
+    version('4.1.0',    branch='release-4.1.0')
+    version('4.0.0',    branch='release-4.0.0')
+    version('4.0.0',    branch='release-4.0.0')
+    version('3.0.0',    branch='release-3.0.0')
+    version('2.3-lts',  branch='release-2-3-lts')
+    version('2.3.1',    branch='release-2-3-1')
+    version('2.3.0',    branch='release-2-3-0')
+
 
     variant('gui',      default=True,   description='Build GUI and interactive SAGA tools')
     variant('odbc',     default=True,   description='Build with ODBC support')
@@ -81,7 +92,7 @@ class SagaGis(AutotoolsPackage):
             if '~libfire' in self.spec:
                 args.append('--disable-libfire')
 
-            if '~openmpi' in self.spec:
+            if '~openmp' in self.spec:
                 args.append('--disable-openmp')
 
             if '+python' in self.spec:
