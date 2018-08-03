@@ -23,7 +23,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
 from spack import *
-
+import pdb
 
 class SagaGis(AutotoolsPackage):
     """
@@ -35,7 +35,7 @@ class SagaGis(AutotoolsPackage):
 
     homepage    = "http://saga-gis.org/"
     url         = "https://sourceforge.net/projects/saga-gis/files/SAGA%20-%205/SAGA%20-%205.0.0/saga-5.0.0.tar.gz"
-    git         = "git://git.code.sf.net/p/saga-gis/code"
+    git         = "https://git.code.sf.net/p/saga-gis/code"
 
     version('develop',  branch='master')
     version('6.4.0',    branch='release-6.4.0', preferred=True)
@@ -74,7 +74,10 @@ class SagaGis(AutotoolsPackage):
     depends_on('qhull', when='~triangle')
     depends_on('swig', type='build', when='+python')
 
+    configure_directory='saga-gis'
+
     def autoreconf(self, spec, prefix):
+#        with working_dir('saga-gis'):
         autoreconf('--install', '--verbose', '--force')
 
     def configure_args(self):
