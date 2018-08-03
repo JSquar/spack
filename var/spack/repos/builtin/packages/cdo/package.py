@@ -36,6 +36,8 @@ class Cdo(AutotoolsPackage):
 
     maintainers = ['skosukhin']
 
+    patch('fix_sorting.patch')
+
     version('1.9.3', '13ae222164413dbd53532b03b072def5')
     version('1.9.2', '38e68d34f0b5b44a52c3241be6831423')
     version('1.9.1', 'e60a89f268ba24cee5c461f2c217829e')

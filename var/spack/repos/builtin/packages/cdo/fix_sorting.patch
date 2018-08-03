@@ -1,0 +1,55 @@
+diff -Naur -w cdo-1.9.3/src/cdo_int.h cdo-1.9.3_patched/src/cdo_int.h
+--- cdo-1.9.3/src/cdo_int.h	2018-01-25 09:19:27.000000000 +0100
++++ cdo-1.9.3_patched/src/cdo_int.h	2018-07-20 18:56:04.905961978 +0200
+@@ -196,7 +196,7 @@
+ 		   double msval, int *kret, int omisng, int operio, int oveggy);
+ 
+ void cdoCompareGrids(int gridID1, int gridID2);
+-void vlistCompare(int vlistID1, int vlistID2, int flag);
++bool vlistCompare(int vlistID1, int vlistID2, int flag);
+ int  vlistCompareX(int vlistID1, int vlistID2, int flag);
+ 
+ #if defined (__cplusplus)
+diff -Naur -w cdo-1.9.3/src/cdo_vlist.cc cdo-1.9.3_patched/src/cdo_vlist.cc
+--- cdo-1.9.3/src/cdo_vlist.cc	2018-01-25 09:20:07.000000000 +0100
++++ cdo-1.9.3_patched/src/cdo_vlist.cc	2018-07-20 18:58:23.409752939 +0200
+@@ -191,9 +191,10 @@
+ }
+ 
+ 
+-void vlistCompare(int vlistID1, int vlistID2, int flag)
++bool vlistCompare(int vlistID1, int vlistID2, int flag)
+ {
+   int varID;
++  bool error = false;
+   bool lchecknames = false;
+ 
+   int nvars = vlistNvars(vlistID1);
+@@ -218,6 +219,7 @@
+ 	      if ( strcmp(name1, name2) != 0 )
+ 		{
+ 		  cdoWarning("Input streams have different parameter names!");
++      error = true;
+ 		  lchecknames = true;
+ 		  flag -= CMP_NAME;
+ 		  //    break;
+@@ -301,6 +303,7 @@
+       DELETE_2D(names1);
+       DELETE_2D(names2);
+     }
++  return error;
+ }
+ 
+ 
+diff -Naur -w cdo-1.9.3/src/Select.cc cdo-1.9.3_patched/src/Select.cc
+--- cdo-1.9.3/src/Select.cc	2018-01-02 08:34:36.000000000 +0100
++++ cdo-1.9.3_patched/src/Select.cc	2018-07-20 18:57:07.378769901 +0200
+@@ -197,7 +197,7 @@
+ 
+       bool lcopy_const = false;
+ 
+-      if ( indf == 0 )
++      if ( indf == 0 || vlistCompare(vlistID0, vlistID1, CMP_NAME) )
+ 	{
+           bool xresult = true;
+ 
