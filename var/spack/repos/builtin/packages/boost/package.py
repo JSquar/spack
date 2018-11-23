@@ -1,27 +1,8 @@
-##############################################################################
-# Copyright (c) 2013-2018, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
+# Copyright 2013-2018 Lawrence Livermore National Security, LLC and other
+# Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
-# This file is part of Spack.
-# Created by Todd Gamblin, tgamblin@llnl.gov, All rights reserved.
-# LLNL-CODE-647188
-#
-# For details, see https://github.com/spack/spack
-# Please also see the NOTICE and LICENSE files for our notice and the LGPL.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License (as
-# published by the Free Software Foundation) version 2.1, February 1999.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the terms and
-# conditions of the GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public
-# License along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-##############################################################################
+# SPDX-License-Identifier: (Apache-2.0 OR MIT)
+
 from spack import *
 import sys
 import os
@@ -43,6 +24,7 @@ class Boost(Package):
     list_depth = 1
 
     version('develop', branch='develop', submodules=True)
+    version('1.68.0', '18863a7cae4d58ae85eb63d400f774f60a383411')
     version('1.67.0', '694ae3f4f899d1a80eb7a3b31b33be73c423c1ae')
     version('1.66.0', 'b6b284acde2ad7ed49b44e856955d7b1ea4e9459')
     version('1.65.1', '41d7542ce40e171f3f7982aff008ff0d')
@@ -132,8 +114,6 @@ class Boost(Package):
             description="Build single-threaded versions of libraries")
     variant('icu', default=False,
             description="Build with Unicode and ICU suport")
-    variant('graph', default=False,
-            description="Build the Boost Graph library")
     variant('taggedlayout', default=False,
             description="Augment library names with build options")
     variant('versionedlayout', default=False,
@@ -142,6 +122,9 @@ class Boost(Package):
             description='Compile with clang libc++ instead of libstdc++')
     variant('numpy', default=False,
             description='Build the Boost NumPy library (requires +python)')
+    variant('pic', default=False,
+            description='Generate position-independent code (PIC), useful '
+                        'for building static libraries')
 
     depends_on('icu4c', when='+icu')
     depends_on('python', when='+python')
@@ -233,14 +216,12 @@ class Boost(Package):
                                                        spack_cxx))
 
             if '+mpi' in spec:
-
                 # Use the correct mpi compiler.  If the compiler options are
                 # empty or undefined, Boost will attempt to figure out the
                 # correct options by running "${mpicxx} -show" or something
                 # similar, but that doesn't work with the Cray compiler
                 # wrappers.  Since Boost doesn't use the MPI C++ bindings,
                 # that can be used as a compiler option instead.
-
                 mpi_line = 'using mpi : %s' % spec['mpi'].mpicxx
 
                 if 'platform=cray' in spec:
@@ -332,6 +313,9 @@ class Boost(Package):
             flag = self.cxxstd_to_flag(spec.variants['cxxstd'].value)
             if flag:
                 cxxflags.append(flag)
+
+        if '+pic' in self.spec:
+            cxxflags.append(self.compiler.pic_flag)
 
         # clang is not officially supported for pre-compiled headers
         # and at least in clang 3.9 still fails to build
