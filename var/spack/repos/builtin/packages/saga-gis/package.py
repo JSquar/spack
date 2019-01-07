@@ -1,44 +1,24 @@
-##############################################################################
-# Copyright (c) 2013-2018, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
+# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
-# This file is part of Spack.
-# Created by Todd Gamblin, tgamblin@llnl.gov, All rights reserved.
-# LLNL-CODE-647188
-#
-# For details, see https://github.com/spack/spack
-# Please also see the NOTICE and LICENSE files for our notice and the LGPL.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License (as
-# published by the Free Software Foundation) version 2.1, February 1999.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the terms and
-# conditions of the GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public
-# License along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-##############################################################################
+# SPDX-License-Identifier: (Apache-2.0 OR MIT)
 from spack import *
-import pdb
+
 
 class SagaGis(AutotoolsPackage):
     """
-    SAGA is a GIS for Automated Geoscientific Analyses and has been designed for an
-    easy and effective implementation of spatial algorithms. It offers a comprehensive,
-    growing set of geoscientific methods and provides an easily approachable user
-    interface with many visualisation options
+    SAGA is a GIS for Automated Geoscientific Analyses and has been designed
+    for an easy and effective implementation of spatial algorithms. It offers
+    a comprehensive, growing set of geoscientific methods and provides an
+    easily approachable user interface with many visualisation options
     """
-
     homepage    = "http://saga-gis.org/"
     url         = "https://sourceforge.net/projects/saga-gis/files/SAGA%20-%205/SAGA%20-%205.0.0/saga-5.0.0.tar.gz"
-    git         = "https://git.code.sf.net/p/saga-gis/code"
+    git         = "git://git.code.sf.net/p/saga-gis/code"
 
     version('develop',  branch='master')
-    version('6.4.0',    branch='release-6.4.0', preferred=True)
+    version('7.0.0',    branch='release-7.0.0', preferred=True)
+    version('6.4.0',    branch='release-6.4.0')
     version('6.3.0',    branch='release-6.3.0')
     version('6.2.0',    branch='release-6.2.0')
     version('6.1.0',    branch='release-6.1.0')
@@ -53,10 +33,12 @@ class SagaGis(AutotoolsPackage):
     version('2.3.1',    branch='release-2-3-1')
     version('2.3.0',    branch='release-2-3-0')
 
-
     variant('gui',      default=True,   description='Build GUI and interactive SAGA tools')
     variant('odbc',     default=True,   description='Build with ODBC support')
-    variant('triangle', default=True,   description='Build with triangle.c non free for commercial use otherwise use qhull')
+    # FIXME Saga-gis configure file disables triangle even if
+    # --enable-triangle flag is used
+    # variant('triangle', default=True,   description='Build with triangle.c
+    # non free for commercial use otherwise use qhull')
     variant('libfire',  default=True,   description='Build with libfire (non free for commercial usage)')
     variant('openmp',   default=True,   description='Build with OpenMP enabled')
     variant('python',   default=False,  description='Build Python extension')
@@ -66,39 +48,33 @@ class SagaGis(AutotoolsPackage):
     depends_on('libtool',  type='build')
     depends_on('m4',       type='build')
 
+    # FIXME unnecessary dependency on python3 because of implicit python3
+    # dependency through meson by a dependency of wx/gtkplus
+    depends_on('python@3:')
+
     depends_on('wx')
     depends_on('gdal')
-    depends_on('unixodbc')
     depends_on('proj')
 
-    depends_on('qhull', when='~triangle')
+    depends_on('unixodbc', when='+odbc')
+    # FIXME Saga-Gis uses a wrong include path
+    # depends_on('qhull', when='~triangle')
     depends_on('swig', type='build', when='+python')
 
-    configure_directory='saga-gis'
-
-    def autoreconf(self, spec, prefix):
-#        with working_dir('saga-gis'):
-        autoreconf('--install', '--verbose', '--force')
+    configure_directory = "saga-gis"
 
     def configure_args(self):
         args = []
-        if self.spec.satisfies('@5:'):
-            if '~gui' in self.spec:
-                args.append('--disable-gui')
-
-            if '~odbc' in self.spec:
-                args.append('--disable-odbc')
-
-            if '~triangle' in self.spec:
-                args.append('--disable-triangle')
-
-            if '~libfire' in self.spec:
-                args.append('--disable-libfire')
-
-            if '~openmp' in self.spec:
-                args.append('--disable-openmp')
-
-            if '+python' in self.spec:
-                args.append('--enable-python')
+        args += self.enable_or_disable('gui')
+        args += self.enable_or_disable('odbc')
+        # FIXME Saga-gis configure file disables triangle even if
+        # --enable-triangle flag is used
+        # args += self.enable_or_disable('triangle')
+        # FIXME SAGA-GIS uses a wrong include path
+        # if '~triangle' in self.spec:
+        #    args.append('--disable-triangle')
+        args += self.enable_or_disable('libfire')
+        args += self.enable_or_disable('openmp')
+        args += self.enable_or_disable('python')
 
         return args
