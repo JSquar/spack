@@ -25,11 +25,12 @@ RUN mkdir -p $SPACK_ROOT/opt/spack
 
 MASK PUSH
 MASK [[ $DISTRO == arch ]]
-RUN pacman -Sy --noconfirm                                     \
-        base-devel   ca-certificates curl   gcc                \
-        gcc-fortran  git             gnupg2 iproute2           \
-        make         openssh         python python-pip         \
-        sudo         tcl                                       \
+RUN pacman -Syu --noconfirm                                    \
+ && pacman -Sy --noconfirm                                     \
+        base-devel   ca-certificates curl    gcc               \
+        gcc-fortran  git             gnupg2  inetutils         \
+        iproute2     make            openssh procps-ng         \
+        python       python-pip      sudo    tcl               \
  && echo 'nobody ALL=(ALL) NOPASSWD: ALL' >                    \
         /etc/sudoers.d/nobody-sudo                             \
  && sudo -u nobody git clone                                   \
@@ -59,7 +60,8 @@ RUN yum update -y
 
   MASK PUSH
   MASK [[ $DISTRO =~ rhel.* ]]
-  RUN yum install -y yum-conf-repos.noarch \
+  RUN (  yum install -y yum-conf-repos.noarch                         \
+   ||    yum install -y yum-conf-epel.noarch yum-conf-elrepo.noarch ) \
    && yum update -y
   MASK POP
 
@@ -109,7 +111,7 @@ RUN apt-get -yqq update                                   \
         openssh-server  python          python-pip tcl
 
   MASK PUSH
-  MASK [[ $DISTRO_VERSION == bionic ]]
+  MASK [[ $DISTRO_VERSION == 18.04 ]]
   # [WORKAROUND]
   # https://bugs.launchpad.net/ubuntu/+source/lua-posix/+bug/1752082
   RUN ln -s posix_c.so /usr/lib/x86_64-linux-gnu/lua/5.2/posix.so
