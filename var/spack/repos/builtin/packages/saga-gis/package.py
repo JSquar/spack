@@ -42,6 +42,8 @@ class SagaGis(AutotoolsPackage):
     variant('libfire',  default=True,   description='Build with libfire (non free for commercial usage)')
     variant('openmp',   default=True,   description='Build with OpenMP enabled')
     variant('python',   default=False,  description='Build Python extension')
+    variant('grib',     default=False,  description='Build with support for grib files')
+    variant('netcdf',   default=False,  description='Build with support for netcdf files')
 
     depends_on('autoconf', type='build')
     depends_on('automake', type='build')
@@ -54,6 +56,8 @@ class SagaGis(AutotoolsPackage):
 
     depends_on('wx')
     depends_on('gdal')
+    depends_on('gdal+grib', when='+grib')
+    depends_on('gdal+netcdf', when='+netcdf')
     depends_on('proj')
 
     depends_on('unixodbc', when='+odbc')
