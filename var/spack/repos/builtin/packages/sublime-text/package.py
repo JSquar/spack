@@ -13,6 +13,7 @@ class SublimeText(Package):
     homepage = "http://www.sublimetext.com/"
     url      = "https://download.sublimetext.com/sublime_text_3_build_3176_x64.tar.bz2"
 
+    version('3_build_3200', sha256='b9d5297c65bd14a8ba3394e74dbd9a5013b3fed5a5a2f8f5120d2cec40614fbd')
     version('3_build_3176', '7d4c8c5167224888d901e8cbafb6ec7f')
     version('3_build_3126', 'acc34252b0ea7dff1f581c5db1564dcb')
     version('2.0.2',        '699cd26d7fe0bada29eb1b2cd7b50e4b')
