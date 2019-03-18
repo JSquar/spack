@@ -17,7 +17,10 @@ class SagaGis(AutotoolsPackage):
     git         = "git://git.code.sf.net/p/saga-gis/code"
 
     version('develop',  branch='master')
-    version('7.0.0',    branch='release-7.0.0', preferred=True)
+    version('7.3.0',    branch='release-7.3.0')
+    version('7.1.1',    branch='release-7.1.1')
+    version('7.1.0',    branch='release-7.1.0')
+    version('7.0.0',    branch='release-7.0.0')
     version('6.4.0',    branch='release-6.4.0')
     version('6.3.0',    branch='release-6.3.0')
     version('6.2.0',    branch='release-6.2.0')
@@ -39,11 +42,13 @@ class SagaGis(AutotoolsPackage):
     # --enable-triangle flag is used
     # variant('triangle', default=True,   description='Build with triangle.c
     # non free for commercial use otherwise use qhull')
-    variant('libfire',  default=True,   description='Build with libfire (non free for commercial usage)')
-    variant('openmp',   default=True,   description='Build with OpenMP enabled')
-    variant('python',   default=False,  description='Build Python extension')
-    variant('grib',     default=False,  description='Build with support for grib files')
-    variant('netcdf',   default=False,  description='Build with support for netcdf files')
+    variant('libfire',      default=True,   description='Build with libfire (non free for commercial usage)')
+    variant('openmp',       default=True,   description='Build with OpenMP enabled')
+    variant('python',       default=False,  description='Build Python extension')
+    variant('grib',         default=False,  description='Build with support for grib files')
+    variant('netcdf',       default=False,  description='Build with support for netcdf files')
+    variant('postgresql',   default=True,   description='Build with PostgreSQL library')
+    variant('opencv',       default=True,   description='Build with libraries using OpenCV')
 
     depends_on('autoconf', type='build')
     depends_on('automake', type='build')
@@ -59,6 +64,9 @@ class SagaGis(AutotoolsPackage):
     depends_on('gdal+grib', when='+grib')
     depends_on('gdal+netcdf', when='+netcdf')
     depends_on('proj')
+    depends_on('postgresql', when='+postgresql')
+    depends_on('opencv', when='+opencv')
+
 
     depends_on('unixodbc', when='+odbc')
     # FIXME Saga-Gis uses a wrong include path
@@ -80,5 +88,6 @@ class SagaGis(AutotoolsPackage):
         args += self.enable_or_disable('libfire')
         args += self.enable_or_disable('openmp')
         args += self.enable_or_disable('python')
+        args += self.with_or_without('postgresql')
 
         return args
