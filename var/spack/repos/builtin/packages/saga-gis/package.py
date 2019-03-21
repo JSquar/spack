@@ -47,8 +47,8 @@ class SagaGis(AutotoolsPackage):
     variant('python',       default=False,  description='Build Python extension')
     variant('grib',         default=False,  description='Build with support for grib files')
     variant('netcdf',       default=False,  description='Build with support for netcdf files')
-    variant('postgresql',   default=True,   description='Build with PostgreSQL library')
-    variant('opencv',       default=True,   description='Build with libraries using OpenCV')
+    variant('postgresql',   default=False,   description='Build with PostgreSQL library')
+    variant('opencv',       default=False,   description='Build with libraries using OpenCV')
 
     depends_on('autoconf', type='build')
     depends_on('automake', type='build')
@@ -60,12 +60,19 @@ class SagaGis(AutotoolsPackage):
     depends_on('python@3:')
 
     depends_on('wx')
+    depends_on('proj')
+    depends_on('libharu')
     depends_on('gdal')
     depends_on('gdal+grib', when='+grib')
     depends_on('gdal+netcdf', when='+netcdf')
-    depends_on('proj')
     depends_on('postgresql', when='+postgresql')
-    depends_on('opencv', when='+opencv')
+    # FIXME erroneous concretisation of opencv (#9753) results in a lot of explicit dependencies
+    # depends_on('opencv', when='+opencv')
+    depends_on('opencv^libjpeg^hdf5+hl^vtk+osmesa^mesa', when='+opencv')
+    depends_on('libjpeg', when='+opencv')
+    depends_on('hdf5+hl', when='+opencv')
+    depends_on('vtk+osmesa^mesa', when='+opencv')
+    #depends_on('opencv', when='+opencv')
 
 
     depends_on('unixodbc', when='+odbc')
