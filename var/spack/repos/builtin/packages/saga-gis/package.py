@@ -47,9 +47,9 @@ class SagaGis(AutotoolsPackage):
     variant('python',       default=False,  description='Build Python extension')
     variant('grib',         default=False,  description='Build with support for grib files')
     variant('netcdf',       default=False,  description='Build with support for netcdf files')
-    variant('postgresql',   default=True,   description='Build with PostgreSQL library')
-    # FIXME: Disabled due to problem with gl provider, see #8133
-    # variant('opencv',       default=False,   description='Build with libraries using OpenCV')
+    variant('postgresql',   default=False,  description='Build with PostgreSQL library')
+    # FIXME: Set default False due to problem with gl provider, see #8133
+    variant('opencv',       default=False,  description='Build with libraries using OpenCV')
 
     depends_on('autoconf', type='build')
     depends_on('automake', type='build')
@@ -67,8 +67,6 @@ class SagaGis(AutotoolsPackage):
     depends_on('proj')
     depends_on('postgresql', when='+postgresql')
     depends_on('opencv', when='+opencv')
-
-
     depends_on('unixodbc', when='+odbc')
     # FIXME Saga-Gis uses a wrong include path
     # depends_on('qhull', when='~triangle')
