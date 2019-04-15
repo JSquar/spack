@@ -48,7 +48,8 @@ class SagaGis(AutotoolsPackage):
     variant('grib',         default=False,  description='Build with support for grib files')
     variant('netcdf',       default=False,  description='Build with support for netcdf files')
     variant('postgresql',   default=True,   description='Build with PostgreSQL library')
-    variant('opencv',       default=True,   description='Build with libraries using OpenCV')
+    # FIXME: Disabled due to problem with gl provider, see #8133
+    # variant('opencv',       default=False,   description='Build with libraries using OpenCV')
 
     depends_on('autoconf', type='build')
     depends_on('automake', type='build')
