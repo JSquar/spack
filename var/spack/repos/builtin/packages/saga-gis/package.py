@@ -48,7 +48,7 @@ class SagaGis(AutotoolsPackage):
     variant('grib',         default=False,  description='Build with support for grib files')
     variant('netcdf',       default=False,  description='Build with support for netcdf files')
     variant('postgresql',   default=False,  description='Build with PostgreSQL library')
-    # FIXME: Set default False due to problem with gl provider, see #8133
+    # FIXME: Variant opencv cannot be used due to problem with gl provider, see #8133
     variant('opencv',       default=False,  description='Build with libraries using OpenCV')
 
     depends_on('autoconf', type='build')
@@ -90,3 +90,7 @@ class SagaGis(AutotoolsPackage):
         args += self.with_or_without('postgresql')
 
         return args
+
+    def setup_environment(self, spack_env, run_env):
+        print("Hallo Welt")
+        print(run_env)
