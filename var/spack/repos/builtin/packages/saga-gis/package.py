@@ -47,8 +47,9 @@ class SagaGis(AutotoolsPackage):
     variant('python',       default=False,  description='Build Python extension')
     variant('grib',         default=False,  description='Build with support for grib files')
     variant('netcdf',       default=False,  description='Build with support for netcdf files')
-    variant('postgresql',   default=False,   description='Build with PostgreSQL library')
-    variant('opencv',       default=False,   description='Build with libraries using OpenCV')
+
+    variant('postgresql',   default=False,  description='Build with PostgreSQL library')
+    variant('opencv',       default=False,  description='Build with libraries using OpenCV')
 
     depends_on('autoconf', type='build')
     depends_on('automake', type='build')
@@ -66,19 +67,18 @@ class SagaGis(AutotoolsPackage):
     depends_on('gdal+grib', when='+grib')
     depends_on('gdal+netcdf', when='+netcdf')
     depends_on('postgresql', when='+postgresql')
-    # FIXME erroneous concretisation of opencv (#9753) results in a lot of explicit dependencies
-    # depends_on('opencv', when='+opencv')
-    depends_on('opencv^libjpeg^hdf5+hl^vtk+osmesa^mesa', when='+opencv')
-    depends_on('libjpeg', when='+opencv')
-    depends_on('hdf5+hl', when='+opencv')
-    depends_on('vtk+osmesa^mesa', when='+opencv')
-    #depends_on('opencv', when='+opencv')
-
-
     depends_on('unixodbc', when='+odbc')
     # FIXME Saga-Gis uses a wrong include path
     # depends_on('qhull', when='~triangle')
     depends_on('swig', type='build', when='+python')
+
+    depends_on('opencv', when='+opencv')
+    # Set jpeg provider (similar to #8133)
+    depends_on('libjpeg', when='+opencv')
+    # Set hl variant due to #7145
+    depends_on('hdf5+hl', when='+opencv')
+    # Set osmesa variant due to #7061
+    depends_on('vtk+osmesa', when='+opencv')
 
     configure_directory = "saga-gis"
 
@@ -98,3 +98,13 @@ class SagaGis(AutotoolsPackage):
         args += self.with_or_without('postgresql')
 
         return args
+
+    def setup_environment(self, spack_env, run_env):
+        if '+python' in self.spec:
+            python_dir = "python{0}".format(self.spec['python'].version.up_to(2))
+            package_dir = join_path(self.prefix.lib, python_dir, "site-packages")
+            run_env.prepend_path("PYTHONPATH", package_dir)
+
+            # Point saga to its tool set
+            run_env.set("SAGA_MLB", join_path(self.prefix.lib, "saga"))
+
