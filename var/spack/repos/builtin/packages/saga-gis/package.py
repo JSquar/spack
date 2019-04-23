@@ -101,9 +101,10 @@ class SagaGis(AutotoolsPackage):
 
     def setup_environment(self, spack_env, run_env):
         if '+python' in self.spec:
-            python_dir = "python{0}".format(self.spec['python'].version.up_to(2))
-            package_dir = join_path(self.prefix.lib, python_dir, "site-packages")
-            run_env.prepend_path("PYTHONPATH", package_dir)
+            #python_dir = "python{0}".format(self.spec['python'].version.up_to(2))
+            #package_dir = join_path(self.prefix.lib, python_dir, "site-packages")
+            #run_env.prepend_path("PYTHONPATH", package_dir)
+            extends('python')
 
             # Point saga to its tool set
             run_env.set("SAGA_MLB", join_path(self.prefix.lib, "saga"))
