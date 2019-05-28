@@ -108,6 +108,8 @@ class Petsc(Package):
 
     patch('xcode_stub_out_of_sync.patch', when='@:3.10.4')
 
+    patch('xlf_fix-dup-petscfecreate.patch', when='@3.11.0')
+
     # Virtual dependencies
     # Git repository needs sowing to build Fortran interface
     depends_on('sowing', when='@develop')
@@ -301,7 +303,7 @@ class Petsc(Package):
                 'camd,amd,suitesparseconfig'
             options.extend([
                 '--with-suitesparse-include=%s' % spec[ss_spec].prefix.include,
-                '--with-suitesparse-lib=%s' % spec[ss_spec].libs.ld_flags,
+                '--with-suitesparse-lib=%s' % spec[ss_spec].libs.joined(),
                 '--with-suitesparse=1'
             ])
         else:
