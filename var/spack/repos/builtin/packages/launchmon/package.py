@@ -19,12 +19,14 @@ class Launchmon(AutotoolsPackage):
     depends_on('autoconf', type='build', when='@master')
     depends_on('automake', type='build', when='@master')
     depends_on('libtool', type='build', when='@master')
-    depends_on('pkg-config', type='build')
+    depends_on('pkgconfig', type='build')
     depends_on('libgcrypt')
     depends_on('libgpg-error')
     depends_on("elf", type='link')
     depends_on("boost")
     depends_on("spectrum-mpi", when='arch=ppc64le')
+
+    patch('launchmon-char-conv.patch', when='@1.0.2')
 
     def setup_environment(self, spack_env, run_env):
         if self.spec.satisfies('@master'):

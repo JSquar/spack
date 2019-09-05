@@ -9,6 +9,7 @@ import contextlib
 import errno
 import functools
 import inspect
+import itertools
 import os
 import re
 import shutil
@@ -151,9 +152,10 @@ class FastPackageChecker(Mapping):
 
             # Warn about invalid names that look like packages.
             if not valid_module_name(pkg_name):
-                msg = 'Skipping package at {0}. '
-                msg += '"{1}" is not a valid Spack module name.'
-                tty.warn(msg.format(pkg_dir, pkg_name))
+                if not pkg_name.startswith('.'):
+                    tty.warn('Skipping package at {0}. "{1}" is not '
+                             'a valid Spack module name.'.format(
+                                 pkg_dir, pkg_name))
                 continue
 
             # Construct the file name from the directory
@@ -920,7 +922,9 @@ class Repo(object):
 
         # Install patch files needed by the package.
         mkdirp(path)
-        for patch in spec.patches:
+        for patch in itertools.chain.from_iterable(
+                spec.package.patches.values()):
+
             if patch.path:
                 if os.path.exists(patch.path):
                     install(patch.path, path)
