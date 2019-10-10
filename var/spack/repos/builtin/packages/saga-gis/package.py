@@ -17,6 +17,7 @@ class SagaGis(AutotoolsPackage):
     git         = "git://git.code.sf.net/p/saga-gis/code"
 
     version('develop',  branch='master')
+    version('7.4.0',    branch='release-7.4.0')
     version('7.3.0',    branch='release-7.3.0')
     version('7.1.1',    branch='release-7.1.1')
     version('7.1.0',    branch='release-7.1.0')
@@ -45,8 +46,6 @@ class SagaGis(AutotoolsPackage):
     variant('libfire',      default=True,   description='Build with libfire (non free for commercial usage)')
     variant('openmp',       default=True,   description='Build with OpenMP enabled')
     variant('python',       default=False,  description='Build Python extension')
-    variant('grib',         default=False,  description='Build with support for grib files')
-    variant('netcdf',       default=False,  description='Build with support for netcdf files')
 
     variant('postgresql',   default=False,  description='Build with PostgreSQL library')
     variant('opencv',       default=False,  description='Build with libraries using OpenCV')
@@ -61,15 +60,16 @@ class SagaGis(AutotoolsPackage):
     depends_on('python@3:')
 
     # SAGA-GIS requires projects.h from proj
-    depends_on('proj@:5.2.0')
+    depends_on('proj')
     depends_on('libharu')
     depends_on('wxwidgets')
+
     # gdal@3: does not work with proj@:5.2.0
-    depends_on('gdal@:2.999')
-    depends_on('gdal+grib', when='+grib')
-    depends_on('gdal+netcdf', when='+netcdf')
+    depends_on('gdal+grib+netcdf')
+    #depends_on('gdal@:2.999', when='^proj@:5.2.0')
+
     # FIXME transitiv dependency version range from gdal->libgeotiff is ignored, therefore set explicit
-    depends_on('libgeotiff@:1.4')
+    depends_on('libgeotiff@:1.4', when='gdal@:2.4')
     depends_on('postgresql', when='+postgresql')
     depends_on('unixodbc', when='+odbc')
     # FIXME Saga-Gis uses a wrong include path
@@ -84,7 +84,9 @@ class SagaGis(AutotoolsPackage):
     # Set osmesa variant due to #7061
     depends_on('vtk+osmesa', when='+opencv')
 
-    conflicts('gdal@:2.2', when='+grib')
+    # write support for grib2 is available since 2.3.0 (https://gdal.org/drivers/raster/grib.html)
+    conflicts('gdal@:2.2.999')
+    conflicts('proj@5.2.0:', when='@:7.0.3')
 
     configure_directory = "saga-gis"
 
@@ -107,11 +109,7 @@ class SagaGis(AutotoolsPackage):
 
     def setup_environment(self, spack_env, run_env):
         if '+python' in self.spec:
-            #python_dir = "python{0}".format(self.spec['python'].version.up_to(2))
-            #package_dir = join_path(self.prefix.lib, python_dir, "site-packages")
-            #run_env.prepend_path("PYTHONPATH", package_dir)
             extends('python')
-
             # Point saga to its tool set
             run_env.set("SAGA_MLB", join_path(self.prefix.lib, "saga"))
 
