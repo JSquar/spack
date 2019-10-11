@@ -39,9 +39,11 @@ class SagaGis(AutotoolsPackage):
 
     variant('gui',      default=True,   description='Build GUI and interactive SAGA tools')
     variant('odbc',     default=True,   description='Build with ODBC support')
+
     # FIXME Saga-gis configure file disables triangle even if
     # --enable-triangle flag is used
     # variant('triangle', default=True,   description='Build with triangle.c
+
     # non free for commercial use otherwise use qhull')
     variant('libfire',      default=True,   description='Build with libfire (non free for commercial usage)')
     variant('openmp',       default=True,   description='Build with OpenMP enabled')
@@ -59,19 +61,23 @@ class SagaGis(AutotoolsPackage):
     # dependency through meson by a dependency of wx/gtkplus
     depends_on('python@3:')
 
+    # https://sourceforge.net/p/saga-gis/bugs/271/
+    depends_on('proj@:5', when='@7.2:')
     # SAGA-GIS requires projects.h from proj
-    depends_on('proj')
+    #depends_on('proj')
+
     depends_on('libharu')
     depends_on('wxwidgets')
 
+    depends_on('gdal@:2+grib+netcdf+proj')
     # gdal@3: does not work with proj@:5.2.0
-    depends_on('gdal+grib+netcdf')
-    #depends_on('gdal@:2.999', when='^proj@:5.2.0')
+    #depends_on('gdal@:2+grib+netcdf', when='^proj@:5.2.0')
 
-    # FIXME transitiv dependency version range from gdal->libgeotiff is ignored, therefore set explicit
-    depends_on('libgeotiff@:1.4', when='gdal@:2.4')
+    # FIXME Variants are not properly forwarded to dependencies
+    #depends_on('libgeotiff@:1.4', when='^gdal@:2.4')
     depends_on('postgresql', when='+postgresql')
     depends_on('unixodbc', when='+odbc')
+
     # FIXME Saga-Gis uses a wrong include path
     # depends_on('qhull', when='~triangle')
     depends_on('swig', type='build', when='+python')
@@ -86,7 +92,7 @@ class SagaGis(AutotoolsPackage):
 
     # write support for grib2 is available since 2.3.0 (https://gdal.org/drivers/raster/grib.html)
     conflicts('gdal@:2.2.999')
-    conflicts('proj@5.2.0:', when='@:7.0.3')
+    conflicts('libgeotiff@1.5:', when='^gdal@:2.4')
 
     configure_directory = "saga-gis"
 
@@ -108,8 +114,8 @@ class SagaGis(AutotoolsPackage):
         return args
 
     def setup_environment(self, spack_env, run_env):
-        if '+python' in self.spec:
+        if self.spec.satisfies('+python'):
             extends('python')
-            # Point saga to its tool set
+            # Point saga to its tool set, will be loaded during runtime
             run_env.set("SAGA_MLB", join_path(self.prefix.lib, "saga"))
 
