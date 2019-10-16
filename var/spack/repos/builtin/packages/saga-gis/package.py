@@ -62,14 +62,15 @@ class SagaGis(AutotoolsPackage):
     depends_on('python@3:')
 
     # https://sourceforge.net/p/saga-gis/bugs/271/
-    depends_on('proj@:5', when='@7.2:')
+    depends_on('proj@:5', when='@:7.2.999')
     # SAGA-GIS requires projects.h from proj
-    #depends_on('proj')
+    depends_on('proj')
 
     depends_on('libharu')
     depends_on('wxwidgets')
 
-    depends_on('gdal@:2+grib+netcdf+proj')
+    depends_on('gdal')
+    #depends_on('gdal@:2+grib+netcdf+proj')
     # gdal@3: does not work with proj@:5.2.0
     #depends_on('gdal@:2+grib+netcdf', when='^proj@:5.2.0')
 
