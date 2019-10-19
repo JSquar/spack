@@ -7,7 +7,11 @@ from spack import *
 
 
 class PyCdsapi(PythonPackage):
-    """The Climate Data Store Application Program Interface is a service providing programmatic access to CDS data. Get your UID and API key from the CDS portal at the address https://cds.climate.copernicus.eu/user and write it into the configuration file. Look at https://pypi.org/project/cdsapi/ for an example"""
+    """The Climate Data Store Application Program Interface is a service
+    providing programmatic access to CDS data. Get your UID and API key
+    from the CDS portal at the address https://cds.climate.copernicus.eu/user
+    and write it into the configuration file. Look at
+    https://pypi.org/project/cdsapi/ for an example"""
 
     homepage = "https://cds.climate.copernicus.eu"
     url      = "https://files.pythonhosted.org/packages/source/c/cdsapi/cdsapi-0.2.3.tar.gz"
@@ -15,4 +19,3 @@ class PyCdsapi(PythonPackage):
     version('0.2.3', '333b31ec263224399635db9b21a2e1a50cd73451f5179f8d967437e7c9161d9b')
 
     depends_on('py-setuptools', type='build')
-
