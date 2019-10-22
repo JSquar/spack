@@ -49,6 +49,8 @@ __all__ = [
     'is_exe',
     'join_path',
     'mkdirp',
+    'partition_path',
+    'prefixes',
     'remove_dead_links',
     'remove_if_dead_link',
     'remove_linked_tree',
@@ -151,6 +153,7 @@ def filter_file(regex, repl, *filenames, **kwargs):
         tty.debug(msg.format(filename, regex))
 
         backup_filename = filename + "~"
+        tmp_filename = filename + ".spack~"
 
         if ignore_absent and not os.path.exists(filename):
             msg = 'FILTER FILE: file "{0}" not found. Skipping to next file.'
@@ -162,6 +165,10 @@ def filter_file(regex, repl, *filenames, **kwargs):
         if not os.path.exists(backup_filename):
             shutil.copy(filename, backup_filename)
 
+        # Create a temporary file to read from. We cannot use backup_filename
+        # in case filter_file is invoked multiple times on the same file.
+        shutil.copy(filename, tmp_filename)
+
         try:
             extra_kwargs = {}
             if sys.version_info > (3, 0):
@@ -169,7 +176,7 @@ def filter_file(regex, repl, *filenames, **kwargs):
 
             # Open as a text file and filter until the end of the file is
             # reached or we found a marker in the line if it was specified
-            with open(backup_filename, mode='r', **extra_kwargs) as input_file:
+            with open(tmp_filename, mode='r', **extra_kwargs) as input_file:
                 with open(filename, mode='w', **extra_kwargs) as output_file:
                     # Using iter and readline is a workaround needed not to
                     # disable input_file.tell(), which will happen if we call
@@ -188,17 +195,19 @@ def filter_file(regex, repl, *filenames, **kwargs):
             # If we stopped filtering at some point, reopen the file in
             # binary mode and copy verbatim the remaining part
             if current_position and stop_at:
-                with open(backup_filename, mode='rb') as input_file:
+                with open(tmp_filename, mode='rb') as input_file:
                     input_file.seek(current_position)
                     with open(filename, mode='ab') as output_file:
                         output_file.writelines(input_file.readlines())
 
         except BaseException:
+            os.remove(tmp_filename)
             # clean up the original file on failure.
             shutil.move(backup_filename, filename)
             raise
 
         finally:
+            os.remove(tmp_filename)
             if not backup and os.path.exists(backup_filename):
                 os.remove(backup_filename)
 
@@ -653,7 +662,7 @@ def replace_directory_transaction(directory_name, tmp_root=None):
         tty.debug('TEMPORARY DIRECTORY DELETED [{0}]'.format(tmp_dir))
 
 
-def hash_directory(directory):
+def hash_directory(directory, ignore=[]):
     """Hashes recursively the content of a directory.
 
     Args:
@@ -670,11 +679,12 @@ def hash_directory(directory):
     for root, dirs, files in os.walk(directory):
         for name in sorted(files):
             filename = os.path.join(root, name)
-            # TODO: if caching big files becomes an issue, convert this to
-            # TODO: read in chunks. Currently it's used only for testing
-            # TODO: purposes.
-            with open(filename, 'rb') as f:
-                md5_hash.update(f.read())
+            if filename not in ignore:
+                # TODO: if caching big files becomes an issue, convert this to
+                # TODO: read in chunks. Currently it's used only for testing
+                # TODO: purposes.
+                with open(filename, 'rb') as f:
+                    md5_hash.update(f.read())
 
     return md5_hash.hexdigest()
 
@@ -1607,3 +1617,70 @@ def search_paths_for_executables(*path_hints):
             executable_paths.append(bin_dir)
 
     return executable_paths
+
+
+def partition_path(path, entry=None):
+    """
+    Split the prefixes of the path at the first occurrence of entry and
+    return a 3-tuple containing a list of the prefixes before the entry, a
+    string of the prefix ending with the entry, and a list of the prefixes
+    after the entry.
+
+    If the entry is not a node in the path, the result will be the prefix list
+    followed by an empty string and an empty list.
+    """
+    paths = prefixes(path)
+
+    if entry is not None:
+        # Derive the index of entry within paths, which will correspond to
+        # the location of the entry in within the path.
+        try:
+            entries = path.split(os.sep)
+            i = entries.index(entry)
+            if '' in entries:
+                i -= 1
+            return paths[:i], paths[i], paths[i + 1:]
+        except ValueError:
+            pass
+
+    return paths, '', []
+
+
+def prefixes(path):
+    """
+    Returns a list containing the path and its ancestors, top-to-bottom.
+
+    The list for an absolute path will not include an ``os.sep`` entry.
+    For example, assuming ``os.sep`` is ``/``, given path ``/ab/cd/efg``
+    the resulting paths will be, in order: ``/ab``, ``/ab/cd``, and
+    ``/ab/cd/efg``
+
+    The list for a relative path starting ``./`` will not include ``.``.
+    For example, path ``./hi/jkl/mn`` results in a list with the following
+    paths, in order: ``./hi``, ``./hi/jkl``, and ``./hi/jkl/mn``.
+
+    Parameters:
+        path (str): the string used to derive ancestor paths
+
+    Returns:
+        A list containing ancestor paths in order and ending with the path
+    """
+    if not path:
+        return []
+
+    parts = path.strip(os.sep).split(os.sep)
+    if path.startswith(os.sep):
+        parts.insert(0, os.sep)
+    paths = [os.path.join(*parts[:i + 1]) for i in range(len(parts))]
+
+    try:
+        paths.remove(os.sep)
+    except ValueError:
+        pass
+
+    try:
+        paths.remove('.')
+    except ValueError:
+        pass
+
+    return paths
