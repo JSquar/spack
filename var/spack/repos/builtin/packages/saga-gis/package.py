@@ -57,10 +57,6 @@ class SagaGis(AutotoolsPackage):
     depends_on('libtool',  type='build')
     depends_on('m4',       type='build')
 
-    # FIXME unnecessary dependency on python3 because of implicit python3
-    # dependency through meson by a dependency of wx/gtkplus
-    depends_on('python@3:')
-
     # https://sourceforge.net/p/saga-gis/bugs/271/
     depends_on('proj@:5', when='@:7.2.999')
     # SAGA-GIS requires projects.h from proj
