@@ -78,6 +78,7 @@ class SagaGis(AutotoolsPackage):
     # FIXME Saga-Gis uses a wrong include path
     # depends_on('qhull', when='~triangle')
     depends_on('swig', type='build', when='+python')
+    extends('python', when='+python')
 
     # Saga-Gis depends on legacy opencv API
     depends_on('opencv@:3', when='+opencv')
@@ -112,8 +113,6 @@ class SagaGis(AutotoolsPackage):
         return args
 
     def setup_environment(self, spack_env, run_env):
-        if self.spec.satisfies('+python'):
-            extends('python')
-            # Point saga to its tool set, will be loaded during runtime
-            run_env.set("SAGA_MLB", join_path(self.prefix.lib, "saga"))
+        # Point saga to its tool set, will be loaded during runtime
+        run_env.set("SAGA_MLB", join_path(self.prefix.lib, "saga"))
 
