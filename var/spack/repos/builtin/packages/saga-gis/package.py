@@ -79,7 +79,8 @@ class SagaGis(AutotoolsPackage):
     # depends_on('qhull', when='~triangle')
     depends_on('swig', type='build', when='+python')
 
-    depends_on('opencv', when='+opencv')
+    # Saga-Gis depends on legacy opencv API
+    depends_on('opencv@:3', when='+opencv')
     # Set jpeg provider (similar to #8133)
     depends_on('libjpeg', when='+opencv')
     # Set hl variant due to #7145
@@ -88,7 +89,7 @@ class SagaGis(AutotoolsPackage):
     depends_on('vtk+osmesa', when='+opencv')
 
     # write support for grib2 is available since 2.3.0 (https://gdal.org/drivers/raster/grib.html)
-    conflicts('gdal@:2.2.999')
+    conflicts('gdal@:2.2')
     conflicts('libgeotiff@1.5:', when='^gdal@:2.4')
 
     configure_directory = "saga-gis"
