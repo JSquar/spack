@@ -57,41 +57,39 @@ class SagaGis(AutotoolsPackage):
     depends_on('libtool',  type='build')
     depends_on('m4',       type='build')
 
-    # https://sourceforge.net/p/saga-gis/bugs/271/
-    depends_on('proj@:5', when='@:7.2.999')
-    # SAGA-GIS requires projects.h from proj
-    depends_on('proj')
-
     depends_on('libharu')
     depends_on('wxwidgets')
+    depends_on('postgresql', when='+postgresql')
+    depends_on('unixodbc', when='+odbc')
 
-    depends_on('gdal')
-    #depends_on('gdal@:2+grib+netcdf+proj')
+    # SAGA-GIS requires projects.h from proj
+    depends_on('proj')
+    # https://sourceforge.net/p/saga-gis/bugs/271/
+    depends_on('proj@:5', when='@:7.2.999')
+
+    # Saga-Gis depends on legacy opencv API removed in opencv 4.x
+    depends_on('opencv@:3', when='+opencv')
+    # Set jpeg provider (similar to #8133)
+    depends_on('libjpeg', when='+opencv')
+    # Set hl variant due to similar issue #7145
+    depends_on('hdf5+hl')
+
+    # write support for grib2 is available since 2.3.0 (https://gdal.org/drivers/raster/grib.html)
+    depends_on('gdal@2.3:+grib+hdf5+netcdf')
     # gdal@3: does not work with proj@:5.2.0
     #depends_on('gdal@:2+grib+netcdf', when='^proj@:5.2.0')
 
     # FIXME Variants are not properly forwarded to dependencies
     #depends_on('libgeotiff@:1.4', when='^gdal@:2.4')
-    depends_on('postgresql', when='+postgresql')
-    depends_on('unixodbc', when='+odbc')
 
     # FIXME Saga-Gis uses a wrong include path
     # depends_on('qhull', when='~triangle')
+
+    # conflicts('libgeotiff@1.5:', when='^gdal@:2.4')
+
     depends_on('swig', type='build', when='+python')
     extends('python', when='+python')
 
-    # Saga-Gis depends on legacy opencv API
-    depends_on('opencv@:3', when='+opencv')
-    # Set jpeg provider (similar to #8133)
-    depends_on('libjpeg', when='+opencv')
-    # Set hl variant due to #7145
-    depends_on('hdf5+hl', when='+opencv')
-    # Set osmesa variant due to #7061
-    depends_on('vtk+osmesa', when='+opencv')
-
-    # write support for grib2 is available since 2.3.0 (https://gdal.org/drivers/raster/grib.html)
-    conflicts('gdal@:2.2')
-    conflicts('libgeotiff@1.5:', when='^gdal@:2.4')
 
     configure_directory = "saga-gis"
 
