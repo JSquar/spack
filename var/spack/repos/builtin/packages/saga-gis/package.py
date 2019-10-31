@@ -76,16 +76,9 @@ class SagaGis(AutotoolsPackage):
 
     # write support for grib2 is available since 2.3.0 (https://gdal.org/drivers/raster/grib.html)
     depends_on('gdal@2.3:+grib+hdf5+netcdf')
-    # gdal@3: does not work with proj@:5.2.0
-    #depends_on('gdal@:2+grib+netcdf', when='^proj@:5.2.0')
-
-    # FIXME Variants are not properly forwarded to dependencies
-    #depends_on('libgeotiff@:1.4', when='^gdal@:2.4')
 
     # FIXME Saga-Gis uses a wrong include path
     # depends_on('qhull', when='~triangle')
-
-    # conflicts('libgeotiff@1.5:', when='^gdal@:2.4')
 
     depends_on('swig', type='build', when='+python')
     extends('python', when='+python')
