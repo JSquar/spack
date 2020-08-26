@@ -14,7 +14,14 @@ class Shtools(MakefilePackage):
 
     maintainers = ['eschnett']
 
-    version('4.5', sha256='1975a2a2bcef8c527d321be08c13c2bc479e0d6b81c468a3203f95df59be4f89')
+    version('4.6.2', tag='v4.6.2')
+    version('4.6.1', tag='v4.6.1')
+    version('4.6', tag='v4.6')
+    version('4.5.4', tag='v4.5.4')
+    version('4.5.3', tag='v4.5.3')
+    version('4.5.2', tag='v4.5.2')
+    version('4.5.1', tag='v4.5.1')
+    version('4.5', tag='v4.5')
 
     # Note: This package also provides Python wrappers. We do not
     # install these properly yet, only the Fortran library is
