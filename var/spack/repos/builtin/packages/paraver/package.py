@@ -16,10 +16,14 @@ class Paraver(Package):
     Note: This package is deprecated in favor of wxparaver"""
 
     homepage = "https://tools.bsc.es/paraver"
-    url = "https://ftp.tools.bsc.es/wxparaver/wxparaver-4.6.3-src.tar.bz2"
+    url = "https://ftp.tools.bsc.es/wxparaver/wxparaver-4.12.0-src.tar.bz2"
 
     # NOTE: Paraver provides only latest version for download.
     #       Don't keep/add older versions.
+    version(
+        "4.12.0",
+        sha256="26b5a4f833a222643d6d340e61ba5a46c5b01c42108f24df0873215cdfb506dd",
+    )
     version(
         "4.6.3",
         sha256="ac6025eec5419e1060967eab71dfd123e585be5b5f3ac3241085895dbeca255a",
